@@ -6,8 +6,9 @@
  Функция должна принимать один аргумент и возвращать его
  */
 function returnFirstArgument(arg) {
-	return arg;
-};
+
+    return arg;
+}
 
 /*
  Задание 2:
@@ -16,8 +17,9 @@ function returnFirstArgument(arg) {
  Значение по умолчанию второго аргумента должно быть 100
  */
 function defaultParameterValue(a, b = 100) {
-	return a + b;
-};
+
+    return a + b;
+}
 
 /*
  Задание 3:
@@ -27,11 +29,13 @@ function defaultParameterValue(a, b = 100) {
  */
 function returnArgumentsArray() {
     var arr = [];
+
     for (var i = 0, len = arguments.length; i < len; i++) {
-		arr.push(arguments[i]);
-	}
+        arr.push(arguments[i]);
+    }
+
     return arr;
-};
+}
 
 /*
  Задание 4:
@@ -39,12 +43,9 @@ function returnArgumentsArray() {
  Функция должна принимать другую функцию и возвращать результат вызова переданной функции
  */
 function returnFnResult(fn) {
-	return 'random number is ' + fn();
-};
 
-function F() {
-	return Math.floor(Math.random()*(100-0));
-};
+    return fn();
+}
 
 /*
  Задание 5:
@@ -53,10 +54,11 @@ function F() {
  При вызове F, переданное число должно быть увеличено на единицу и возвращено из F
  */
 function returnCounter(number = 0) {
-	function F() {
-		return ++number;
-	}
-	return F();
+
+    return function F() {
+
+        return ++number;
+    }
 }
 
 /*
@@ -65,12 +67,10 @@ function returnCounter(number = 0) {
  Функция должна принимать другую функцию (F) и некоторое количество дополнительных аргументов
  Функция должна привязать переданные аргументы к функции F и вернуть получившуюся функцию
  */
-function bindFunction(fn, x, n) {
-	return fn(x, n);
-}
+function bindFunction(F, x, n) {
+    var newF = F.bind(null, x, n);
 
-function pow(x, n) {
-	return x ** n;
+    return newF;
 }
 
 export {
