@@ -9,9 +9,6 @@ function returnFirstArgument(arg) {
 	return arg;
 };
 
-var result = returnFirstArgument(Math.floor(Math.random()*(100-0)));
-console.log('Exercise 1: '+result);
-
 /*
  Задание 2:
 
@@ -22,9 +19,6 @@ function defaultParameterValue(a, b = 100) {
 	return a + b;
 };
 
-var sum = defaultParameterValue(50, 30);
-console.log('Excercise 2: '+sum);
-
 /*
  Задание 3:
 
@@ -32,15 +26,12 @@ console.log('Excercise 2: '+sum);
  Количество переданных аргументов заранее неизвестно
  */
 function returnArgumentsArray() {
-	var arr = [];
-	for (var i = 0, len = arguments.length; i < len; i++) {
+    var arr = [];
+    for (var i = 0, len = arguments.length; i < len; i++) {
 		arr.push(arguments[i]);
 	}
-	return arr;
+    return arr;
 };
-
-console.log('Excercise 3: '+returnArgumentsArray('1', 2, 'three'));
-
 
 /*
  Задание 4:
@@ -55,8 +46,6 @@ function F() {
 	return Math.floor(Math.random()*(100-0));
 };
 
-console.log('Excercise 4: '+returnFnResult(F));
-
 /*
  Задание 5:
 
@@ -69,8 +58,6 @@ function returnCounter(number = 0) {
 	}
 	return F();
 }
-
-console.log('Excercise 5: '+returnCounter());
 
 /*
  Задание 6 *:
@@ -85,8 +72,6 @@ function bindFunction(fn, x, n) {
 function pow(x, n) {
 	return x ** n;
 }
-
-console.log('Excercise 6: '+bindFunction(pow, 2, 2));
 
 export {
     returnFirstArgument,
