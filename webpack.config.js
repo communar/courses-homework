@@ -16,7 +16,7 @@ module.exports = {
     entry: './src/index.js',
     output: {
         filename: '[hash].js',
-        path: './dist'
+        path: __dirname + './dist'
     },
     devtool: 'source-map',
     module: {

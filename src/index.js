@@ -7,6 +7,11 @@
  * @return {Element}
  */
 function createDivWithText(text) {
+    let elem = document.createElement('div');
+
+    elem.textContent = text;
+
+    return elem;
 }
 
 /**
@@ -16,6 +21,11 @@ function createDivWithText(text) {
  * @return {Element}
  */
 function createAWithHref(hrefValue) {
+    let elem = document.createElement('a');
+
+    elem.setAttribute('href', hrefValue);
+
+    return elem;
 }
 
 /**
@@ -25,6 +35,9 @@ function createAWithHref(hrefValue) {
  * @param {Element} where - куда вставлять
  */
 function prepend(what, where) {
+    let before = where.firstChild;
+
+    where.insertBefore(what, before);
 }
 
 /**
@@ -42,6 +55,16 @@ function prepend(what, where) {
  * т.к. следующим соседом этих элементов является элемент с тегом P
  */
 function findAllPSiblings(where) {
+    let arr = [],
+        kid = where.children;
+
+    for (let i = 0, len = kid.length; i < len; i++) {
+        if (kid[i].nextElementSibling && kid[i].nextElementSibling.tagName == 'P') {
+            arr.push(kid[i]);
+        }
+    }
+
+    return arr;
 }
 
 /**
@@ -53,10 +76,10 @@ function findAllPSiblings(where) {
  * @return {Array<string>}
  */
 function findError(where) {
-    var result = [];
+    let result = [];
 
-    for (var i = 0; i < where.childNodes.length; i++) {
-        result.push(where.childNodes[i].innerText);
+    for (let i = 0, len = where.children.length; i < len; i++) {
+        result.push(where.children[i].textContent);
     }
 
     return result;
@@ -76,8 +99,15 @@ function findError(where) {
  * должно быть преобразовано в <div></div><p></p>
  */
 function deleteTextNodes(where) {
-}
+    let childNodes = where.childNodes;
 
+    for (let i = 0, len = childNodes.length; i < len; i++) {
+        if (childNodes[i] && childNodes[i].nodeType !== 1) {
+            where.removeChild(childNodes[i]);
+            i--;
+        }
+    }
+}
 /**
  * Выполнить предудыщее задание с использование рекурсии
  * то есть необходимо заходить внутрь каждого дочернего элемента
@@ -89,8 +119,18 @@ function deleteTextNodes(where) {
  * должно быть преобразовано в <span><div><b></b></div><p></p></span>
  */
 function deleteTextNodesRecursive(where) {
-}
+    let child;
 
+    for (let i = 0, len = where.childNodes.length; i < len; i++) {
+        if (where.childNodes[i] && where.childNodes[i].nodeType !== 1) {
+            where.removeChild(where.childNodes[i]);
+            i--;
+        } else if (where.childNodes[i] && where.childNodes[i].childNodes) {
+            child = where.childNodes[i];
+            deleteTextNodesRecursive(child);
+        }
+    }
+}
 /**
  * *** Со звездочкой ***
  * Необходимо собрать статистику по всем узлам внутри элемента root и вернуть ее в виде объекта
@@ -113,9 +153,39 @@ function deleteTextNodesRecursive(where) {
  *   texts: 3
  * }
  */
-function collectDOMStat(root) {
-}
+var stat = {
+    tags: {},
+    classes: {},
+    texts: 0
+};
 
+function collectDOMStat(root) {
+    var child,
+        childNodes = root.childNodes;
+
+    for (var i = 0, len = childNodes.length; i < len; i++) {
+        if (childNodes[i] && childNodes[i].nodeType !== 1) {
+            stat.texts++;
+        } else if (childNodes[i] && childNodes[i].childNodes) {
+            if (stat.tags.hasOwnProperty([childNodes[i].tagName])) {
+                stat.tags[childNodes[i].tagName]++;
+            } else {
+                stat.tags[childNodes[i].tagName] = 1;
+            }
+            for (var j = 0, classLen = childNodes[i].classList.length; j < classLen; j++) {
+                if (stat.classes.hasOwnProperty([childNodes[i].classList[j]])) {
+                    stat.classes[childNodes[i].classList[j]]++;
+                } else {
+                    stat.classes[childNodes[i].classList[j]] = 1;
+                }
+            }
+            child = childNodes[i];
+            collectDOMStat(child);
+        }
+    }
+
+    return stat;
+}
 /**
  * *** Со звездочкой ***
  * Функция должна отслеживать добавление и удаление элементов внутри элемента where
@@ -146,7 +216,43 @@ function collectDOMStat(root) {
  *   type: 'remove',
  *   nodes: [div]
  * }
- */
+
+function observeChildNodes(where, fn) {
+    let child,
+        arg = {
+            type: '',
+            nodes: []
+        },
+        options = {
+            childList: true,
+            characterData: true,
+            attributes: true
+        };
+
+    for (let i = 0, len = where.childNodes.length; i < len; i++) {
+        var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutations) {
+                if (mutations.addedNodes) {
+                    arg.nodes.push(mutations.addedNodes[0]);
+                    arg.type = 'insert';
+                } else if (mutations.removedNodes) {
+                    arg.nodes.push(mutations.removedNodes[0]);
+                    arg.type = 'remove';
+                }
+            });
+        });
+        
+        observer.observe(where, options);
+        if (where.childNodes[i] && where.childNodes[i].childNodes) {
+            child = where.childNodes[i];
+            observeChildNodes(child, fn);
+        }
+    }
+    
+    return fn(arg);
+}
+*/
+
 function observeChildNodes(where, fn) {
 }
 
