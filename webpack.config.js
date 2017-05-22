@@ -19,7 +19,7 @@ module.exports = {
         dnd: './src/dnd.js'
     },
     output: {
-        filename: '[hash].js',
+        filename: '[id][hash].js',
         path: path.resolve('dist')
     },
     devtool: 'source-map',

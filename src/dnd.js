@@ -22,21 +22,21 @@ let homeworkContainer = document.querySelector('#homework-container');
  *
  * @return {Element}
  */
-function randomColor() {
-    var color = '#',
-        letters = '0123456789ABCDEF'.split('');
-
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.round(Math.random() * 15)];
-    }
-
-    return color;
-}
-
 function createDiv() {
     var elem = document.createElement('div'),
         style = elem.style,
         body = document.body;
+
+    function randomColor() {
+        var color = '#',
+            letters = '0123456789ABCDEF'.split('');
+
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.round(Math.random() * 15)];
+        }
+
+        return color;
+    }
 
     elem.setAttribute('class', 'draggable-div');
     style.backgroundColor = randomColor();
