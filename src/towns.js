@@ -46,26 +46,22 @@ function loadTowns() {
             loadingBlock.style.display = 'block';
             loadingBlock.textContent = 'Загрузка...';
         });
-        xhr.addEventListener('error', () => {
-            reject('Не удалось загрузить города');
-           }
-        );
+        xhr.addEventListener('error', () => reject('Не удалось загрузить города'));
         xhr.addEventListener('load', () => {
             if (xhr.status == 200) {
                 let citiesArray = JSON.parse(xhr.response);
 
                 loadingBlock.style.display = 'none';
                 resolve(citiesArray.sort((a, b) => {
-                	if ( a.name < b.name ) {
+                    if ( a.name < b.name ) {
 
                         return -1;
                     } else if ( a.name > b.name ) {
 
                         return 1;
-                    } else {
-
-                        return 0;
                     }
+
+                    return 0;
                 }));
             } else {
                 reject('Не удалось загрузить города');
@@ -92,16 +88,27 @@ function isMatching(full, chunk) {
     if ( full.toLowerCase().indexOf(chunk.toLowerCase()) !== -1 ) {
 
         return true;
-    } else {
-
-        return false;
     }
+
+    return false;
 }
 
-// Функция для очищения поля вывода городов
-function cleanSearchField(parent, array) {
-    for (let elem of array)  {
-        parent.removeChild(elem);
+// Копирование элементов массива whence в массив where
+function copyArray(whence, where) {
+    whence.map((item) => where.push(item));
+}
+
+// Вывод сообщения и кнопки перезагрузки в случае ошибки
+function errorInstruction(error) {
+    loadingBlock.style.display = 'block';
+    loadingBlock.textContent = error;
+    againButton.style.display = 'block';
+}
+
+// Функция для очищения поля вывода
+function cleanSearchField(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
     }
 }
 
@@ -110,48 +117,41 @@ let filterBlock = homeworkContainer.querySelector('#filter-block');
 let filterInput = homeworkContainer.querySelector('#filter-input');
 let filterResult = homeworkContainer.querySelector('#filter-result');
 let againButton = document.createElement('button');
-let townsPromise;
 
 filterBlock.appendChild(againButton);
+againButton.setAttribute('style', 'display:none;');
 againButton.textContent = 'Повторить';
+let townsPromise = [];
+
+loadTowns()
+.then((towns) => copyArray(towns, townsPromise))
+.catch((error) => {
+    errorInstruction(error);
+    againButton.addEventListener('click', () => {
+        loadTowns()
+        .then((towns) => copyArray(towns, townsPromise))
+        .catch((error) => errorInstruction(error));
+    });
+});
 
 filterInput.addEventListener('keyup', function() {
-    let part = filterInput.value,
-        lis = filterResult.childNodes;
+    let part = filterInput.value;
 
-    cleanSearchField(filterResult, lis);
+    cleanSearchField(filterResult);
     if (part) {
-        loadTowns().then((towns) => {
-            againButton.style.display = 'none';
-            for (let town of towns) {
+        filterResult.innerHTML = townsPromise
+            .filter((town) => {
                 if (isMatching(town.name, part)) {
-                    let li = document.createElement('li');
-
-                    li.textContent = town.name;
-                    filterResult.appendChild(li);
+                        
+                    return town;
                 }
-            }
-        })
-        .catch((error) => {
-            loadingBlock.style.display = 'block';
-            loadingBlock.textContent = error;
-            againButton.style.display = 'block';
-            againButton.addEventListener('click', loadTowns);
-        });
+            })
+            .map((town) => town = '<div>' + town.name + '</div>')
+            .join('');
     }
 });
 
-filterInput.addEventListener('blur', () => {
-    let lis = filterResult.childNodes;
-
-    cleanSearchField(filterResult, lis);
-    loadTowns().catch((error) => {
-        loadingBlock.style.display = 'block';
-        loadingBlock.textContent = error;
-        againButton.style.display = 'block';
-        againButton.addEventListener('click', loadTowns);
-    });
-});
+filterInput.addEventListener('blur', () => cleanSearchField(filterResult));
 
 export {
     loadTowns,

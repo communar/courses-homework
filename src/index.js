@@ -8,7 +8,7 @@
  */
 function delayPromise(seconds) {
     
-    return new Promise(function(resolve, reject) {
+    return new Promise(function(resolve) {
         setTimeout(() => resolve(), seconds * 1000);
     });
 }
@@ -20,9 +20,22 @@ function delayPromise(seconds) {
  *
  * @return {Promise<Array<{name: String}>>}
  */
+ // Функция для сортировки массива
+function sortObjectsArray(a, b) {
+    if ( a.name < b.name ) {
+
+        return -1;
+    } else if ( a.name > b.name ) {
+
+        return 1;
+    }
+
+    return 0;
+}
+
 function loadAndSortTowns() {
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         let xhr = new XMLHttpRequest();
 
         xhr.open('GET', 'https://raw.githubusercontent.com/smelukov/citiesTest/master/cities.json', true);
@@ -30,16 +43,6 @@ function loadAndSortTowns() {
             if (xhr.status == 200) {
                 let citiesArray = JSON.parse(xhr.response);
 
-                function sortObjectsArray(a, b) {
-                    if ( a.name < b.name ) {
-                        return -1;
-                    } else if ( a.name > b.name ) {
-                        return 1;
-                    } else {
-                    	return 0;
-                    }
-                }
-        	    
                 resolve(citiesArray.sort(sortObjectsArray));
             }
         });
