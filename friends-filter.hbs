@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{htmlWebpackPlugin.options.title}}</title>
+    <style>
+        html {
+            background: url('./src/img/space3.jpeg') no-repeat;
+            background-size: cover;
+        }
+
+        body {
+            font-family: Helvetica;
+            font-size: 0.8em;
+        }
+
+        #container {
+            background-color: #fff;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            height: 600px;
+            margin: 10% auto;
+            width: 600px;
+        }
+
+        #headerInfo {
+            background-color: rgb(250, 106, 106);
+            border-radius: 10px 10px 0px 0px;
+            color: #fff;
+            padding: 8px 0px 8px 10px;
+            margin: 0px;
+            width: 100%;
+        }
+
+        #friends,
+        #sub-friends {
+            display: flex;
+            flex-wrap: wrap;
+            height: 522px;
+            overflow: auto;
+        }
+
+        .list {
+            width: 50%;
+            height: 562px;
+        }
+
+        .filter-field {
+            background-color: rgba(164, 164, 164, 0.5);
+            height: 40px;
+            width: 100%;
+        }
+
+        .filter {
+            background-image: url('./src/img/search.svg');
+            background-position: left;
+            background-repeat: no-repeat;
+            background-size: 10% 70%;
+            border: 0px;
+            border-radius: 20px;
+            height: 50%;
+            outline: none;
+            margin: 2.8% 2%;
+            padding-left: 10%;
+            width: 80%;
+        }
+
+        .friend {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .friend:hover {
+            background-color: rgba(164, 164, 164, 0.2);
+        }
+
+        .friend .photo-100 {
+            border-radius: 30%;
+            height: 50px;
+            float: left;
+            margin: 5px 10px;
+            width: 50px;
+        }
+
+        .friend #add {
+            background-image: url('./src/img/add.svg');
+            background-position: right;
+            background-repeat: no-repeat;
+            background-size: 100% 50%;
+            width: 30px;
+            height: 30px;
+            margin: 0 2% 0 auto;
+        }
+
+        .friend #add:hover {
+            background-image: url('./src/img/add-hover.svg');
+        }
+
+        .friend .name {
+            font-weight: bold;
+        }
+
+        .plank {
+            background-color: rgba(150, 150, 150, 0.1);
+            height: 1px;
+            margin: auto;
+            width: 92%;
+        }
+    </style>
+    <script src="http://vk.com/js/api/openapi.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.10/handlebars.min.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <header>
+        <nav></nav>
+    </header>
+    <main>
+        <article>
+            <div id="container">
+                <!--{{> "./ff-content.hbs"}}-->
+                <h1 id="headerInfo"></h1>
+
+                <div class="list main-list">
+                    <div class="filter-field">
+                        <input type="text" class="filter" placeholder="Начните вводить имя друга">
+                    </div>
+                    <div id="friends">
+
+                    </div>
+                </div>
+                <div class="list sub-list">
+                    <div class="filter-field">
+                        <input type="text" class="filter" placeholder="Начните вводить имя друга">
+                    </div>
+                    <div id="sub-friends">
+
+                    </div>
+                </div>
+
+            </div>
+        </article>
+    </main>
+    <footer></footer>
+</body>
+
+</html>
