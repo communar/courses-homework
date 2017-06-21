@@ -1,6 +1,6 @@
 // Настройка работы VK API
     // Обработка запроса
-function vkApi(method, options) {
+function vkApi (method, options) {
     if (!options.v) {
         options.v = '5.64';
     }
@@ -17,24 +17,35 @@ function vkApi(method, options) {
 }
 
     // Иницализация VK
-function vkInit() {
+function vkInit () {
+
     return new Promise((resolve, reject) => {
         VK.init({
             apiId: 6060252
         });
 
-        VK.Auth.login(response => {
+        // Проверка текущей сессии
+            // Если пользователь уже авторизован:
+        VK.Auth.getLoginStatus(response => {
             if (response.session) {
                 resolve(response);
             } else {
-                reject(new Error('Не удалось авторизоваться'));
+                // Если пользователь не авторизован
+                VK.Auth.login(response => {
+                    if (response.session) {
+                        resolve(response);
+                    } else {
+                        reject(new Error('Не удалось авторизоваться'));
+                    }
+                }, 2);
             }
-        }, 2);
+        });
+
     })
 }
 
     // Функция поиска друзей через input-поле
-function search(e) {
+function search (e) {
     let target = e.target;
 
     if (target.id === 'search-field') {
@@ -45,12 +56,12 @@ function search(e) {
 }
 
     // Вспомогательная функция для поиска друзей, выводящая нужные значения
-function sort(target) {
+function sort (target) {
     let resultField = target.parentElement.parentElement.lastElementChild,
         input = target.value;
-        
+
     return Array.from(resultField.children, elem => {
-        if (elem.textContent.includes(input)) {
+        if (elem.textContent.toLowerCase().includes(input.toLowerCase())) {
             elem.style.display = 'flex';
         } else {
             elem.style.display = 'none';
@@ -59,13 +70,21 @@ function sort(target) {
 }
 
     // Функция сохранения списков
-function saveResult() {
-    localStorage.main = friends.innerHTML;
-    localStorage.sub = subFriends.innerHTML;
+function saveResult () {
+    let ids = [];
+
+    Array.from(subFriends.children, friend => {
+        Array.from(friend.children, data => {
+            if (data.dataset.id) {
+                ids.push(data.dataset.id);
+            }
+        });
+    });
+    localStorage.saves = JSON.stringify(ids);
 }
 
     // Перемещение по спискам
-function moveToList(e) {
+function moveToList (e) {
     if (e.target.parentElement.parentElement === friends) {
         subFriends.appendChild(e.target.parentElement);
     } else if (e.target.parentElement.parentElement === subFriends) {
@@ -74,13 +93,20 @@ function moveToList(e) {
 }
 
     // Функция для получения координат элемента
-function getCoords(elem) {
+function getCoords (elem) {
     let box = elem.getBoundingClientRect();
 
     return {
         top: box.top + pageYOffset,
         left: box.left + pageXOffset
     };
+}
+
+// Сравнение id в JSON-данных с id друзей из объекта response
+function numericallyCompareJSON (json, compared) {
+
+    return JSON.parse(json)
+        .some(id => Number(id) === Number(compared))
 }
 
 // Блок объявления переменных
@@ -94,7 +120,7 @@ const template = `
 {{#each response.items}}
     <div class="friend" draggable=true>
         <img class="photo-100" src={{photo_100}}>
-        <div class="name">{{first_name}} {{last_name}}</div>
+        <div class="name" data-id={{id}}>{{first_name}} {{last_name}}</div>
         <div class="add"></div>
         <div class="plank"></div>
     </div>
@@ -117,13 +143,31 @@ new Promise(resolve => {
         fields: 'photo_100'
     }))
     .then(response => {
-        // Проверка на ранние сохранения списков
-        if (localStorage.main && localStorage.sub) {
-            friends.innerHTML = localStorage.main;
-            subFriends.innerHTML = localStorage.sub;
-        } else {
-            friends.innerHTML = templateFunc(response);
+        // Дополнительный response для второго списка друзей
+        let subResponse = {
+            response: {
+                items: {}
+            }
+        };
+
+        // Проверяем, есть ли сохранённые списки друзей
+        if (localStorage.saves) {
+            // Сначала загружаем второй сохранённый список
+            subResponse.response.items = response.response.items
+                .filter(friend => {
+
+                    return numericallyCompareJSON(localStorage.saves, friend.id)
+                })
+            // Изменяем с учётом второго списка объект response
+            response.response.items = response.response.items
+                .filter(friend => {
+
+                    return !(numericallyCompareJSON(localStorage.saves, friend.id))
+                })
         }
+        // Передаём оба *response в hbs-шаблон и загружаем списки
+        friends.innerHTML = templateFunc(response);
+        subFriends.innerHTML = templateFunc(subResponse);
     })
     .then(() => {
         let pluses = document.querySelectorAll('.add'),
